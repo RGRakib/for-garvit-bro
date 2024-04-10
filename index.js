@@ -1,71 +1,60 @@
-const { Client, GatewayIntentBits, ActivityType, TextChannel } = require('discord.js');
-require('dotenv').config();
-const express = require('express');
+const { Client, GatewayIntentBits, ActivityType } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
+const { Player } = require('discord-player');
+const express = require('express');
+require('dotenv').config();
+const ytdl = require('ytdl-core');
+const { DisTube } = require('distube');
+
 const client = new Client({
   intents: Object.keys(GatewayIntentBits).map((a) => {
     return GatewayIntentBits[a];
   }),
 });
+
 const app = express();
 const port = 3000;
 app.get('/', (req, res) => {
   const imagePath = path.join(__dirname, 'index.html');
   res.sendFile(imagePath);
 });
-app.listen(port, () => {
-  console.log(`🔗 Listening to Worst Boy: http://localhost:${port}`);
-  console.log(`🔗 Replit URL: https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`);
-});
-
-
-const statusMessages = ["👑 I am The official bot of The 'Blood✨'","👍","❤️","THANKS 🌇"];
-
-
-let currentIndex = 0;
-const channelId = '';
 
 async function login() {
   try {
     await client.login(process.env.TOKEN);
-    console.log(`\x1b[36m%s\x1b[0m`, `|    🐇 Logged in as ${client.user.tag}`);
+    console.log('\x1b[32m%s\x1b[0m', '|    🍔 Bot logged in successfully!');
+    console.log('\x1b[36m%s\x1b[0m', '|    🚀 Commands Loaded successfully!');
+    console.log('\x1b[32m%s\x1b[0m', `|    🌼 Logged in as ${client.user.username}`);
+    console.log('\x1b[36m%s\x1b[0m', `|    🏡 Bot is in ${client.guilds.cache.size} servers`);
   } catch (error) {
-    console.error('Failed to log in:', error);
-    process.exit(1);
+    console.error('\x1b[31m%s\x1b[0m', '❌ Failed to log in:', error);
+    console.log('\x1b[31m%s\x1b[0m', '❌ Client Not Login, Restarting Process...');
+    process.kill(1);
   }
 }
 
-function updateStatusAndSendMessages() {
-  const currentStatus = statusMessages[currentIndex];
-  const nextStatus = statusMessages[(currentIndex + 1) % statusMessages.length];
-
-  client.user.setPresence({
-    activities: [{ name: currentStatus, type: ActivityType.Custom}],
-    status: 'online',
-  });
-
-  
-  const textChannel = client.channels.cache.get(channelId);
-
-  if (textChannel instanceof TextChannel) {
-   
-    textChannel.send(`Bot status is: ${currentStatus}`);
-  } else {
-
-  }
-
-  currentIndex = (currentIndex + 1) % statusMessages.length;
-}
 
 client.once('ready', () => {
-  console.log(`\x1b[36m%s\x1b[0m`, `|    ✅ Bot is ready as ${client.user.tag}`);
-  console.log(`\x1b[36m%s\x1b[0m`, `|    ✨Thanks for using this code`);
-  updateStatusAndSendMessages();
-
-  setInterval(() => {
-    updateStatusAndSendMessages();
-  }, 5000);
+  setTimeout(() => {
+    console.log('\x1b[32m%s\x1b[0m', `|    🎯 Activity sucessfully set!`);
+    client.user.setPresence({
+      activities: [{ name: `Music with Blood`, type: ActivityType.Listening }],
+      status: 'online',
+    });
+  }, 2000); 
 });
 
+
 login();
+
+
+setInterval(() => {
+  if (!client || !client.user) {
+    console.log('\x1b[31m%s\x1b[0m', '❌ Client Not Logged in, Restarting Process...');
+    process.kill(1);
+  }
+}, 15000);
+
+module.exports = client;
